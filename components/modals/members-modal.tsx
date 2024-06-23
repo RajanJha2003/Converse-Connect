@@ -11,16 +11,25 @@ import {
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useModal } from "@/hooks/use-modal-store";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { CheckCheck, Copy, RefreshCw, ShieldAlert, ShieldBan, ShieldCheck } from "lucide-react";
-import { useOrigin } from "@/hooks/use-origin";
+import { Check, Loader2, MoreVertical, ShieldAlert, ShieldBan, ShieldCheck, ShieldQuestion, UserMinus } from "lucide-react";
 import { useState } from "react";
 import ActionTooltip from "../action-tooltip";
 import { ServerWithMembersWithProfiles } from "@/types";
+import qs from 'query-string'
 import { ScrollArea } from "../ui/scroll-area";
 import { UserAvatar } from "../user-avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuTrigger,
+  DropdownMenuSubTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MemberRole } from "@prisma/client";
 
 const roleIconMap = {
   GUEST: <ShieldBan className="h-4 w-4 ml-2 text-gray-500" />,
@@ -33,12 +42,36 @@ export const MembersModal = () => {
   const [loadingId, setLoadingId] = useState("");
 
   const { isOpen, onClose, type,data,onOpen } = useModal();
-  const origin=useOrigin();
+ 
   const {server}=data as { server: ServerWithMembersWithProfiles };
 
   
 
   const isModalOpen = isOpen && type == "members";
+
+
+  const onRoleChange=async(memberId:string,role:MemberRole)=>{
+    try {
+      setLoadingId(memberId);
+      const url = qs.stringifyUrl({
+        url: `/api/members/${memberId}`,
+        query: {
+          serverId: server?.id,
+        },
+      });
+
+      const response=await axios.patch(url,{role});
+      router.refresh();
+      onOpen("members", { server: response.data });
+
+
+      
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingId("");
+    }
+  };
 
     
 
@@ -71,15 +104,70 @@ export const MembersModal = () => {
                     {member.profile.email}
                   </p>
                   </div>
+                  {
+                    server.profileId!==member.profileId && loadingId!==member.id && (
+                      <div className="ml-auto">
+                        <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <MoreVertical className="h-4 w-4 text-zinc-500" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent side="left">
+
+                          <DropdownMenuSub>
+                          <DropdownMenuSubTrigger className="flex items-center">
+                              <ShieldQuestion className="w-4 h-4 mr-2" />
+                              <span>Role</span>
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuPortal>
+                            <DropdownMenuSubContent>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    onRoleChange(member.id, "GUEST")
+                                  }
+                                >
+                                  <ShieldBan className="w-4 h-4 mr-2" />
+                                  Guest
+                                  {member.role === "GUEST" && (
+                                    <Check className="w-4 h-4 ml-auto" />
+                                  )}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    onRoleChange(member.id, "MODERATOR")
+                                  }
+                                >
+                                  <ShieldCheck className="w-4 h-4 mr-2" />
+                                  Moderator
+                                  {member.role === "MODERATOR" && (
+                                    <Check className="w-4 h-4 ml-auto" />
+                                  )}
+                                </DropdownMenuItem>
+                              </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                          </DropdownMenuSub>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem>
+                          <UserMinus className="w-4 h-4 mr-2" />
+                          Kick
+                          </DropdownMenuItem>
+
+                        </DropdownMenuContent>
+
+                        </DropdownMenu>
+                      </div>
+                    )
+                  }
+
+{loadingId === member.id && (
+                  <Loader2 className="w-4 h-4 animate-spin text-zinc-500 ml-auto " />
+                )}
 
               </div>
             ))
           }
 
         </ScrollArea>
-        <div className="p-6">
-          Hello
-        </div>
+        
       </DialogContent>
     </Dialog>
   );
