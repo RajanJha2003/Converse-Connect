@@ -37,6 +37,7 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { useModal } from "@/hooks/use-modal-store";
 import { ChannelType } from "@prisma/client";
+import qs from "query-string";
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -80,20 +81,21 @@ export const CreateChannelModal = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await axios.post("/api/servers",values);
-
+      const url = qs.stringifyUrl({
+        url: "/api/channels",
+        query: {
+          serverId: params?.serverId
+        }
+      })
+      await axios.post(url,values);
       form.reset();
-
       router.refresh();
       onClose();
-     
-
-      
     } catch (error) {
       console.log(error);
+      
     }
-    
-  }
+  };
 
   const handleClose=()=>{
     form.reset();
