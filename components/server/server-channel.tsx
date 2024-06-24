@@ -3,7 +3,7 @@
 import { ModalType, useModal } from '@/hooks/use-modal-store';
 import { cn } from '@/lib/utils';
 import { Channel, ChannelType, MemberRole, Server } from '@prisma/client';
-import { Edit, Hash, Mic, Video } from 'lucide-react';
+import { Edit, Hash, Lock, Mic, Trash, Video } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import React from 'react'
 import ActionTooltip from '../action-tooltip';
@@ -62,6 +62,19 @@ const ServerChannel = ({channel,server,role}:ServerChannelProps) => {
             />
 
                 </ActionTooltip>
+                <ActionTooltip label="Delete">
+            <Trash
+              onClick={(e) => onAction(e, "deleteChannel")}
+              className=" hidden group-hover:block w-4 h-4 text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition "
+            />
+          </ActionTooltip>
+        </div>
+      )}
+      {channel.name === "general" && (
+        <div className="ml-auto  ">
+          <ActionTooltip label="Locked">
+            <Lock className=" w-4 h-4 text-zinc-500 dark:text-zinc-400 " />
+          </ActionTooltip>
 
             </div>
         )
