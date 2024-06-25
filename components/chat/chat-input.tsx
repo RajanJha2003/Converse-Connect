@@ -11,6 +11,7 @@ import axios from 'axios';
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Plus, Smile } from 'lucide-react';
+import { EmojisPicker } from '../emojis-picker';
 
 interface ChatInputProps {
     apiUrl: string;
@@ -79,7 +80,11 @@ const ChatInput = ({apiUrl,query,name,type}:ChatInputProps) => {
                   />
                   <div className="absolute top-7 right-8">
                   
-                   <Smile />
+                  <EmojisPicker
+                      onChange={(emoji: string) =>
+                        field.onChange(`${field.value} ${emoji}`)
+                      }
+                    />
                   </div>
                 </div>
               </FormControl>
