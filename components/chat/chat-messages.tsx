@@ -20,6 +20,7 @@ interface ChatMessagesProps {
 }
 
 import { format } from "date-fns";
+import { useChatSocket } from "@/hooks/use-chat-socket";
 
 const DATE_FORMAT = "d MMM yyyy, HH:mm";
 
@@ -60,6 +61,8 @@ const ChatMessages = ({
     paramKey,
     paramValue,
   });
+
+  useChatSocket({ queryKey, addKey, updateKey });
 
   if (status === "pending") {
     return (
