@@ -21,6 +21,7 @@ interface ChatMessagesProps {
 
 import { format } from "date-fns";
 import { useChatSocket } from "@/hooks/use-chat-socket";
+import { useChatScroll } from "@/hooks/use-chat-scroll";
 
 const DATE_FORMAT = "d MMM yyyy, HH:mm";
 
@@ -63,6 +64,13 @@ const ChatMessages = ({
   });
 
   useChatSocket({ queryKey, addKey, updateKey });
+  useChatScroll({
+    chatRef,
+    bottomRef,
+    loadMore: fetchNextPage,
+    shouldLoadMore: !isFetchingNextPage && !!hasNextPage,
+    count: data?.pages?.[0]?.items?.length ?? 0,
+  })
 
   if (status === "pending") {
     return (
@@ -136,6 +144,8 @@ const ChatMessages = ({
           ))
         }
         </div>
+
+        <div ref={bottomRef} />
 
       
     </div>
