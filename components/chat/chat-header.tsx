@@ -3,6 +3,7 @@ import React from 'react'
 import { UserAvatar } from '../user-avatar';
 import {MobileToggle} from '../mobile-toggle';
 import SocketIndicator from '../socket-indicator';
+import { ChatVideoButton } from './chat-video-button';
 
 interface ChatHeaderProps {
     imageUrl?: string;
@@ -31,6 +32,10 @@ const ChatHeader = ({imageUrl,name,serverId,type}:ChatHeaderProps) => {
       </p>
 
       <div className="ml-auto flex items-center">
+      {type === "conversation" && (
+          <ChatVideoButton
+           />
+        )}
         
         <SocketIndicator />
       </div>
