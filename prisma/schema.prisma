@@ -151,4 +151,6 @@ model DirectMessage {
 
   @@index([memberId])
   @@index([conversationId])
+
+  
 }
